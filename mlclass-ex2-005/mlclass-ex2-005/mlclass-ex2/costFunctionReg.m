@@ -19,25 +19,32 @@ grad = zeros(size(theta));
 %               derivatives of the cost w.r.t. each parameter in theta
 
 % Compute J
-for i=1:m
-    H = sigmoid(theta' * X(i,:)');
-    J = J + -y(i,:) * log(H) - (1 - y(i,:)) * log(1 - H);
-end
-J = J/m;
+% for i=1:m
+%    H = sigmoid(X(i,:) * theta);
+%    J = J + -y(i,:) * log(H) - (1 - y(i,:)) * log(1 - H);
+% end
+% J = J/m;
 
-regular = 0;
-for j=2:n
-    regular = regular + theta(j)^2;
-end
-regular = regular * lambda / (2 * m);
+% Compute J (Vectorized)
+H = sigmoid(X*theta);
+J = (-y' * log(H) - (1 - y') * log(1 - H))/m;
 
+% Compute regularized term
+% regular = 0;
+% for j=2:n
+%     regular = regular + theta(j)^2;
+% end
+% regular = regular * lambda / (2 * m);
+
+% Apply regularization (Vectorized)
+regular = (sum(theta.^2) - theta(1)) * lambda / (2 * m);
 J = J + regular;
 
 % Compute grad
 for j_iter = 1:length(theta)
     dJ = 0;
     for i=1:m
-        H = sigmoid(theta' * X(i,:)');
+        H = sigmoid(X(i,:) * theta);
         dJ = dJ + (H - y(i,:)) * X(i,j_iter);
     end
     dJ = dJ / m;
@@ -48,6 +55,25 @@ for j_iter = 1:length(theta)
       grad(j_iter) = dJ + (lambda * theta(j_iter)/ m);
     end
 end
+
+% for j_iter = 1:length(theta)
+%     H = sigmoid(X * theta);
+%     dJ = sum((H - y) .* X(:,j_iter))/m;
+% 
+%     if (j_iter < 2)
+%         grad(j_iter) = dJ;
+%     else
+%         grad(j_iter) = dJ + (lambda * theta(j_iter)/ m); 
+%     end
+% end
+
+% Compute grad (Vectorized)
+% H = sigmoid(X * theta);
+% grad = sum(X' * (H - y))/m;
+
+% Apply regularization (Vectorized)
+% regular = lambda * sum(theta)-theta(1) / m;
+% grad = grad + regular;
 
 % =============================================================
 
